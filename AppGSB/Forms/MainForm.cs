@@ -1,64 +1,23 @@
-using AppGSB.Models;
-using AppGSB.Controllers;
-using AppGSB.Views;
+ï»¿using AppGSB.Models;
+using AppGSB.Data;
+using AppGSB.UI;
 
-namespace AppGSB
+namespace AppGSB.Forms;
+
+public partial class MainForm : Form
 {
-    public partial class MainForm : Form
+    private readonly AppDbContext _context;
+    private readonly User _currentUser;
+
+    public MainForm(AppDbContext context, User currentUser)
     {
-        private User _user;
+        InitializeComponent();
+        _context = context;
+        _currentUser = currentUser;
 
-        public MainForm(User user)
-        {
-            InitializeComponent();
-            _user = user;
-            ApplyRight();
-        }
-
-        // ----- General Methods ----- //
-        private void ApplyRight()
-        {
-            // dashboard
-            dashboardMenu.Visible = _user.Role == UserRole.Admin;
-
-            // expenses
-            expensesMenu.Visible = _user.Role == UserRole.Guest;
-        }
-
-        private void showPanel(UserControl panel)
-        {
-            panelContainer.Controls.Clear();
-            panel.Dock = DockStyle.Fill;
-            panelContainer.Controls.Add(panel);
-        }
-
-        // ----- Account Menu ----- //
-
-        // logout
-        private void logoutAccountItem_Click(object sender, EventArgs e)
-        {
-            AppGSB.Controllers.UsersManager.Logout(this);
-        }
-
-        //quit
-        private void quitAccountItem_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        // ----- Dashboard Menu ----- //
-        private void usersDashboardItem_Click(object sender, EventArgs e)
-        {
-            showPanel(new UsersPanels());
-        }
-
-        private void newDashboardItem_Click(object sender, EventArgs e)
-        {
-            var userForm = new UserForm();
-            if (userForm.ShowDialog() == DialogResult.OK)
-            {
-                MessageBox.Show("Utilisateur créé avec succès !", "Succès", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-        }
+        // Init Menu
+        var menu = MenuBuilder.Build(_currentUser, _context, this);
+        this.MainMenuStrip = menu;
+        this.Controls.Add(menu);
     }
 }

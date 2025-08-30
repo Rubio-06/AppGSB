@@ -1,6 +1,6 @@
 ﻿namespace AppGSB.Forms
 {
-    partial class MainForm
+    partial class ProfileForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,32 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
-            lblWelcome = new Label();
-            SuspendLayout();
-            // 
-            // lblWelcome
-            // 
-            lblWelcome.AutoSize = true;
-            lblWelcome.Location = new Point(209, 150);
-            lblWelcome.Name = "lblWelcome";
-            lblWelcome.Size = new Size(122, 20);
-            lblWelcome.TabIndex = 0;
-            lblWelcome.Text = "Welcome To GSB";
-            // 
-            // MainForm
-            // 
-            AutoScaleDimensions = new SizeF(8F, 20F);
-            AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(570, 353);
-            Controls.Add(lblWelcome);
-            Name = "MainForm";
-            Text = "MainForm";
-            ResumeLayout(false);
-            PerformLayout();
+            this.components = new System.ComponentModel.Container();
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Text = "ProfileForm";
         }
 
         #endregion
-
-        private Label lblWelcome;
     }
 }

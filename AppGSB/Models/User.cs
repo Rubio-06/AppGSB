@@ -1,45 +1,50 @@
-﻿using AppGSB.Views;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using AppGSB.Utils;
 
-namespace AppGSB.Models
+namespace AppGSB.Models;
+
+public class User
 {
-    public enum UserRole
-    {
-        Admin,
-        Accountant,
-        Guest
-    }
+    [Key]
+    public int Id { get; set; }
 
-    public class User
-    {
-        public int Id { get; set; }
-        public string Login { get; set; }
-        public string Password { get; set; }
+    [Required, MinLength(3), MaxLength(50)]
+    [Column(TypeName = "varchar(50)")]
+    public required string Login { get; set; }
 
-        public string Firstname { get; set; }
-        public string Lastname { get; set; }
+    [Required, MinLength(8), MaxLength(100)]
+    [Column(TypeName = "varchar(100)")]
+    public required string PasswordHash { get; set; }
 
-        public string Email { get; set; }
+    [Required, MinLength(2), MaxLength(50)]
+    [Column(TypeName = "varchar(50)")]
+    public required string FirstName { get; set; }
 
-        public UserRole Role { get; set; }
+    [Required, MinLength(2), MaxLength(50)]
+    [Column(TypeName = "varchar(50)")]
+    public required string LastName { get; set; }
 
-        public string Sector { get; set; }
+    [Required, EmailAddress, MaxLength(100)]
+    [Column(TypeName = "varchar(100)")]
+    public required string Email { get; set; }
 
-        public User(int id, string login, string password, string firstname, string lastname, string email, UserRole role, string sector) 
-        {
-            Id = id;
-            Login = login;
-            Password = password;
-            Firstname = firstname;
-            Lastname = lastname;
-            Email = email;
-            Role = role;
-            Sector = sector;
-        }
-    }
+    [Required, EnumDataType(typeof(UserRole))]
+    [Column(TypeName = "varchar(50)")]
+    public UserRole Role { get; set; }
+
+    [Required, DataType(DataType.Date)]
+    [Column(TypeName = "date")]
+    public DateTime CreateDate { get; set; } = DateTime.Now;
+
+    [Required]
+    [Column(TypeName = "bit")]
+    public bool IsActive { get; set; } = true;
+
+    // Not Mapped
+    [NotMapped]
+    public string FullName => $"{FirstName} {LastName}";
+
+    // Associated Tables (1-n)
+    public virtual ICollection<ExpenseReport> ExpenseReports { get; set; } = new List<ExpenseReport>();
 }

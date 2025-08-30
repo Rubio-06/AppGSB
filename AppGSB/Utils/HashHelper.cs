@@ -1,19 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
-using System.Security.Cryptography;
 
-namespace AppGSB.Utils
+namespace AppGSB.Utils;
+
+public static class HashHelper
 {
-    public class HashHelper
+    public static string HashPassword(string password)
     {
-        public static string HashPassword(string password)
+        using var sha256 = SHA256.Create();
+        var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+        var builder = new StringBuilder();
+        foreach (var b in bytes)
         {
-            using var sha256 = SHA256.Create();
-            byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToHexString(bytes);
+            builder.Append(b.ToString("x2"));
         }
+        return builder.ToString();
+    }
+
+    public static bool VerifyPassword(string enteredPassword, string storedHash)
+    {
+        return HashPassword(enteredPassword) == storedHash;
     }
 }

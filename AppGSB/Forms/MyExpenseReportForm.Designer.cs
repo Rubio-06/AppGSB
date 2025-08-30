@@ -1,6 +1,6 @@
 ﻿namespace AppGSB.Forms
 {
-    partial class MainForm
+    partial class MyExpenseReportForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,32 +28,32 @@
         /// </summary>
         private void InitializeComponent()
         {
-            lblWelcome = new Label();
+            btnAddReport = new Button();
             SuspendLayout();
             // 
-            // lblWelcome
+            // btnAddReport
             // 
-            lblWelcome.AutoSize = true;
-            lblWelcome.Location = new Point(209, 150);
-            lblWelcome.Name = "lblWelcome";
-            lblWelcome.Size = new Size(122, 20);
-            lblWelcome.TabIndex = 0;
-            lblWelcome.Text = "Welcome To GSB";
+            btnAddReport.Location = new Point(566, 12);
+            btnAddReport.Name = "btnAddReport";
+            btnAddReport.Size = new Size(222, 29);
+            btnAddReport.TabIndex = 0;
+            btnAddReport.Text = "Nouvelle fiche de frais";
+            btnAddReport.UseVisualStyleBackColor = true;
+            btnAddReport.Click += btnAddReport_Click;
             // 
-            // MainForm
+            // MyExpenseReportForm
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(570, 353);
-            Controls.Add(lblWelcome);
-            Name = "MainForm";
-            Text = "MainForm";
+            ClientSize = new Size(800, 450);
+            Controls.Add(btnAddReport);
+            Name = "MyExpenseReportForm";
+            Text = "MyExpenseReportForm";
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
 
-        private Label lblWelcome;
+        private Button btnAddReport;
     }
 }

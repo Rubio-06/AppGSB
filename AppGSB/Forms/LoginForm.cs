@@ -1,67 +1,78 @@
-﻿using AppGSB.Controllers;
+﻿using AppGSB.Data;
 using AppGSB.Utils;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 
-namespace AppGSB.Views
+namespace AppGSB.Forms
 {
     public partial class LoginForm : Form
     {
-        public LoginForm()
+        private readonly AppDbContext _context;
+
+        public LoginForm(AppDbContext context)
         {
             InitializeComponent();
-            UpdateLoginButtonState();
+            _context = context;
+
+            lblErrorLogin.Text = "";
+            lblErrorPassword.Text = "";
+            btnLogin.Enabled = false;
         }
 
-        // handle fields changes
-        private void tbUsername_TextChanged(object sender, EventArgs e)
+        public void ValidateInputs()
         {
-            bool isValid = InputValidator.IsValidUsername(tbUsername.Text, lblUsernameError);
-            UpdateLoginButtonState();
+            bool isLoginValid = Validator.IsValidLogin(tbLogin.Text);
+            lblErrorLogin.Text = isLoginValid 
+                ? "" 
+                : "Le format de l'identifiant est incorrect";
+
+            bool isPasswordValid = Validator.IsValidPassword(tbPassword.Text);
+            lblErrorPassword.Text = isPasswordValid 
+                ? "" 
+                : "Le format du mot de passe est incorect";
+
+            btnLogin.Enabled = isLoginValid && isPasswordValid;
+        }
+
+        private void tbLogin_TextChanged(object sender, EventArgs e)
+        {
+            ValidateInputs();
         }
 
         private void tbPassword_TextChanged(object sender, EventArgs e)
         {
-            bool isValid = InputValidator.IsValidPassword(tbPassword.Text, lblPasswordError);
-            UpdateLoginButtonState();
-        }
-
-        // handle login button
-        private void UpdateLoginButtonState()
-        {
-            bool isUsernameValid = InputValidator.IsValidUsername(tbUsername.Text, lblUsernameError);
-            bool isPasswordValid = InputValidator.IsValidPassword(tbPassword.Text, lblPasswordError);
-
-            btnLogin.Enabled = isUsernameValid && isPasswordValid;
-            btnLogin.BackColor = btnLogin.Enabled ? Color.Navy : Color.Lavender;
+            ValidateInputs();
         }
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
-            string login = tbUsername.Text.Trim();
-            string password = tbPassword.Text.Trim();
+            string login = tbLogin.Text;
+            string password = tbPassword.Text;
 
-            if (UsersManager.Login(login, password))
+            // Final Validation
+            if (!Validator.IsValidLogin(login) || !Validator.IsValidPassword(password))
             {
-                this.DialogResult = DialogResult.OK;
-                this.Hide();
+                MessageBox.Show("Le format de l'identifiant ou du mot de passe est incorrect", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
+
+            // Search User
+            var user = _context.Users.FirstOrDefault(u => u.Login == login);
+
+            // Verify Password & User Existence
+            if (user == null || !HashHelper.VerifyPassword(password, user.PasswordHash))
+            {
+                MessageBox.Show("Identifiant ou mot de passe incorrect.", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            } 
             else
             {
-                MessageBox.Show("Identifiant ou mot de passe invalide.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show($"Bienvenue, {user.FullName} ({user.Role})!", "Succès", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                Form mainForm = new MainForm(_context, user);
+
+                this.Hide();
+                mainForm.ShowDialog();
+                this.Close();
             }
-        }
-
-        private void LoginForm_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }

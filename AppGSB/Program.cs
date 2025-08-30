@@ -1,41 +1,33 @@
-﻿using AppGSB.Views;
-using AppGSB.Models;
-using System.Windows.Forms;
-using AppGSB.Manager;
+﻿using Microsoft.EntityFrameworkCore;
+using AppGSB.Data;
+using AppGSB.Forms;
 
-namespace AppGSB
+namespace AppGSB;
+
+internal static class Program
 {
-    internal static class Program
+    [STAThread]
+    static void Main()
     {
-        [STAThread]
-        static void Main()
+        try
         {
-            ApplicationConfiguration.Initialize();
+            var connexionString = "server=localhost;port=3306;database=gsb_database;user=gsb_user;password=gsb_password;";
 
-            try
-            {
-                // Try database connection
-                DatabaseManager.GetConnection();
-                
-                // Login Form
-                var loginForm = new LoginForm();
-                if (loginForm.ShowDialog() == DialogResult.OK)
-                {
-                    var user = Controllers.UsersManager.ConnectedUser;
-                    if (user != null)
-                    {
-                        Application.Run(new MainForm(user));
-                    }
-                    else
-                    {
-                        MessageBox.Show("Login failed. Please try again.", "Login Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Une erreur est survenue : {ex.Message}", "Erreur", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            var optionsBuilder = new DbContextOptionsBuilder<AppDbContext>();
+            optionsBuilder.UseMySql(connexionString, ServerVersion.AutoDetect(connexionString));
+
+            using var context = new AppDbContext(optionsBuilder.Options);
+
+            // Seed Database
+            DbInitializer.Seed(context);
+
+            ApplicationConfiguration.Initialize();
+            Application.Run(new LoginForm(context));
+
+        } catch (Exception ex)
+        {
+            MessageBox.Show($"An error occurred while initializing the application: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
         }
-    }
+    }    
 }
